@@ -17,15 +17,14 @@ const getEnvAddress = (key: string) => {
   return value ?? null;
 };
 
-const xdcMasternodeManagerAddress = getEnvAddress(
-  'VITE_MASTERNODE_MANAGER_ADDRESS',
+const xdcStakingContractAddress = getEnvAddress(
+  'VITE_STAKING_CONTRACT_ADDRESS',
 );
 
 const masternodeManagerAddresses: Partial<Record<ChainId, Address>> = {};
 
-if (xdcMasternodeManagerAddress) {
-  masternodeManagerAddresses[50] =
-    xdcMasternodeManagerAddress as Address;
+if (xdcStakingContractAddress) {
+  masternodeManagerAddresses[50] = xdcStakingContractAddress as Address;
 }
 
 const contractRegistry: Record<ContractKey, ContractRegistryEntry> = {
