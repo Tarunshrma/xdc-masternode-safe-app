@@ -1,0 +1,6 @@
+{
+  "name": "XDC Masternode Safe App",
+  "description": "A Safe App enabling XDC masternode management from Safe multisig wallets.",
+  "icon": "/xdc-icon.svg",
+  "url": "http://localhost:5173"
+}

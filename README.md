@@ -9,6 +9,13 @@ Safe app documentation:
 
 https://help.safe.global/en/articles/145503-how-to-build-a-safe-app-and-get-it-listed-in-safe-wallet
 
+## Safe App Listing
+
+Safe Apps require a manifest file hosted at a public URL. See
+`public/manifest.json` for local development. When preparing for listing,
+update the manifest URL to your hosted app URL and follow the Safe listing
+guidelines in the reference link above.
+
 ## Development
 
 Install:
