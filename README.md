@@ -21,10 +21,16 @@ npm run dev
 
 ## Project Structure
 
-docs/
+src/
+  app/
+  components/
+  lib/
+    safe/
+    xdc/
+    contracts/
+    config/
 stories/
-lib/
-components/
+doc/
 
 ## Development Approach
 
