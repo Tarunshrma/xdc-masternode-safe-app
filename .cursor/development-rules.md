@@ -2,6 +2,12 @@
 
 Follow these rules for every task.
 
+## Workflow
+
+1. Before starting a new story, summarize what will be implemented and ask for
+   confirmation to proceed.
+2. After completing each story, create a git commit with a relevant message.
+
 ## Engineering Principles
 
 1. Implement only the current story.
