@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
-import { isAddress, type Address } from 'viem';
+import { useMemo, useState } from 'react';
+import { type Address } from 'viem';
 import { isSupportedChain } from '../lib/config/chains';
 import { useSafeContext } from '../lib/safe/context';
+import { validateAddress, validateAmount } from '../lib/validation';
 import MasternodeStatusCard from '../components/MasternodeStatusCard';
 import SafeContextCard from '../components/SafeContextCard';
 import SafeTransactionCard from '../components/SafeTransactionCard';
@@ -12,14 +13,29 @@ const App = () => {
   const { safeAddress, chainId, isInsideSafe, loading, error } =
     useSafeContext();
   const isXdcChain = isSupportedChain(chainId);
-  const validatorAddress = useMemo(() => {
-    const configuredAddress = import.meta.env.VITE_MASTERNODE_ADDRESS;
-    const candidates = [safeAddress, configuredAddress].filter(
-      (value): value is string => Boolean(value),
+  const [masternodeAddressInput, setMasternodeAddressInput] = useState(
+    () => import.meta.env.VITE_MASTERNODE_ADDRESS ?? '',
+  );
+  const [stakeAmountInput, setStakeAmountInput] = useState('0');
+
+  const addressValidation = useMemo(
+    () => validateAddress(masternodeAddressInput),
+    [masternodeAddressInput],
+  );
+  const amountValidation = useMemo(
+    () => validateAmount(stakeAmountInput),
+    [stakeAmountInput],
+  );
+
+  const validationErrors = useMemo(() => {
+    return [addressValidation.error, amountValidation.error].filter(
+      (error): error is string => Boolean(error),
     );
-    const match = candidates.find((value) => isAddress(value));
-    return match ? (match as Address) : null;
-  }, [safeAddress]);
+  }, [addressValidation.error, amountValidation.error]);
+
+  const validatorAddress = addressValidation.address as Address | null;
+  const stakeAmountWei = amountValidation.value;
+  const canSubmit = addressValidation.isValid && amountValidation.isValid;
 
   return (
     <main className="app">
@@ -43,10 +59,20 @@ const App = () => {
         chainId={chainId}
         isInsideSafe={isInsideSafe}
         validatorAddress={validatorAddress}
+        validatorAddressInput={masternodeAddressInput}
+        onValidatorAddressChange={setMasternodeAddressInput}
+        validatorAddressError={addressValidation.error}
+        stakeAmountInput={stakeAmountInput}
+        onStakeAmountChange={setStakeAmountInput}
+        stakeAmountError={amountValidation.error}
+        stakeAmountWei={stakeAmountWei}
+        canSubmit={canSubmit}
       />
       <TransactionPreviewCard
         chainId={chainId}
         validatorAddress={validatorAddress}
+        stakeAmountWei={stakeAmountWei}
+        validationErrors={validationErrors}
       />
     </main>
   );

@@ -5,6 +5,8 @@ import { buildTransaction } from '../lib/contracts/buildTransaction';
 type TransactionPreviewCardProps = {
   chainId: string | null;
   validatorAddress: Address | null;
+  stakeAmountWei: bigint | null;
+  validationErrors: string[];
 };
 
 type TransactionPreview = {
@@ -18,11 +20,19 @@ type TransactionPreview = {
 const TransactionPreviewCard = ({
   chainId,
   validatorAddress,
+  stakeAmountWei,
+  validationErrors,
 }: TransactionPreviewCardProps) => {
   const [preview, setPreview] = useState<TransactionPreview | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (validationErrors.length > 0) {
+      setPreview(null);
+      setPreviewError(null);
+      return;
+    }
+
     if (!chainId || !validatorAddress) {
       setPreview(null);
       setPreviewError(null);
@@ -35,6 +45,7 @@ const TransactionPreviewCard = ({
         contractKey: 'masternodeManager',
         functionName: 'propose',
         args: [validatorAddress],
+        value: stakeAmountWei ?? 0n,
       });
       setPreview({
         contract: 'Masternode Manager',
@@ -48,12 +59,21 @@ const TransactionPreviewCard = ({
       setPreview(null);
       setPreviewError('Unable to build transaction preview.');
     }
-  }, [chainId, validatorAddress]);
+  }, [chainId, stakeAmountWei, validationErrors, validatorAddress]);
 
   return (
     <section className="card">
       <h2>Transaction Preview</h2>
-      {previewError ? (
+      {validationErrors.length > 0 ? (
+        <div>
+          <p className="muted">Fix the validation errors to preview.</p>
+          {validationErrors.map((message) => (
+            <p key={message} className="error-text">
+              {message}
+            </p>
+          ))}
+        </div>
+      ) : previewError ? (
         <p className="muted">{previewError}</p>
       ) : preview ? (
         <div className="safe-details">
