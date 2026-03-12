@@ -12,13 +12,29 @@ export type ContractRegistryEntry = {
   addresses: Partial<Record<ChainId, Address>>;
 };
 
+const getEnvAddress = (key: string) => {
+  const value = import.meta.env[key] as string | undefined;
+  return value ?? null;
+};
+
+const xdcMasternodeManagerAddress = getEnvAddress(
+  'VITE_MASTERNODE_MANAGER_ADDRESS',
+);
+
+const masternodeManagerAddresses: Partial<Record<ChainId, Address>> = {};
+
+if (xdcMasternodeManagerAddress) {
+  masternodeManagerAddresses[50] =
+    xdcMasternodeManagerAddress as Address;
+}
+
 const contractRegistry: Record<ContractKey, ContractRegistryEntry> = {
   masternodeManager: {
     key: 'masternodeManager',
     name: 'Masternode Manager',
     abiKey: 'masternodeManager',
     // TODO: Replace with real contract addresses and ABI keys.
-    addresses: {},
+    addresses: masternodeManagerAddresses,
   },
 };
 
@@ -29,4 +45,15 @@ export const getContractEntry = (key: ContractKey): ContractRegistryEntry => {
 export const loadContractAbi = (key: ContractKey): Abi => {
   const entry = getContractEntry(key);
   return loadAbi(entry.abiKey);
+};
+
+export const getContractAddress = (
+  key: ContractKey,
+  chainId: number | string | null,
+): Address | null => {
+  if (chainId === null) {
+    return null;
+  }
+  const entry = getContractEntry(key);
+  return entry.addresses[Number(chainId)] ?? null;
 };
