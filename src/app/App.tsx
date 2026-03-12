@@ -1,8 +1,10 @@
+import { XDC_CHAIN_ID, isSupportedChain } from '../lib/config/chains';
 import { useSafeContext } from '../lib/safe/context';
 
 const App = () => {
   const { safeAddress, chainId, isInsideSafe, loading, error } =
     useSafeContext();
+  const isXdcChain = isSupportedChain(chainId);
 
   return (
     <main className="app">
@@ -23,6 +25,12 @@ const App = () => {
               <span className="label">Chain ID</span>
               <span className="value">{chainId ?? 'Unknown'}</span>
             </div>
+            {!isXdcChain ? (
+              <p className="warning">
+                Unsupported network. Please switch to XDC (chainId{' '}
+                {XDC_CHAIN_ID}).
+              </p>
+            ) : null}
           </div>
         ) : (
           <div>

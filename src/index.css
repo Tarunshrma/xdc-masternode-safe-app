@@ -46,3 +46,9 @@ body {
   color: #9aa3b2;
   font-size: 14px;
 }
+
+.warning {
+  margin: 12px 0 0;
+  color: #f5b458;
+  font-size: 14px;
+}
