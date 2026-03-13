@@ -13,7 +13,7 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type"
+          "value": "X-Requested-With, content-type, Authorization"
         },
         {
           "key": "Content-Security-Policy",

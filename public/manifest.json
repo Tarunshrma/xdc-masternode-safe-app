@@ -1,6 +1,6 @@
 {
   "name": "XDC Masternode Safe App",
   "description": "A Safe App enabling XDC masternode management from Safe multisig wallets.",
-  "icon": "https://xdc-masternode-safe-app.vercel.app/xdc-icon.svg",
+  "iconPath": "https://xdc-masternode-safe-app.vercel.app/xdc-icon.svg",
   "url": "https://xdc-masternode-safe-app.vercel.app"
 }
