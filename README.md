@@ -57,6 +57,20 @@ Option C: Spaces + CDN
 - Enable CDN + HTTPS.
 - Use the Space URL in Safe's "Add Custom App".
 
+## Deployment (Vercel)
+
+1. Push the repo to GitHub.
+2. Create a new Vercel project from the repo.
+3. Build settings:
+   - Framework: Vite
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Add environment variables:
+   - `VITE_STAKING_CONTRACT_ADDRESS`
+   - `VITE_MASTERNODE_ADDRESS`
+   - `VITE_XDC_RPC_URL`
+5. Deploy and copy the HTTPS URL for Safe's "Add Custom App".
+
 ## Safe Wallet Basics (First Time)
 
 1. Create or import a Safe in Safe Wallet.
