@@ -40,3 +40,59 @@ export const getValidatorInfo = async (
     status,
   };
 };
+
+export const getCandidateCount = async (chainId: number) => {
+  const contractAddress = getContractAddress('masternodeManager', chainId);
+
+  if (!contractAddress) {
+    throw new Error('Masternode manager contract address not configured.');
+  }
+
+  const client = getProvider();
+  const abi = loadContractAbi('masternodeManager');
+
+  return client.readContract({
+    address: contractAddress,
+    abi,
+    functionName: 'candidateCount',
+  }) as Promise<bigint>;
+};
+
+export const getCandidateCap = async (
+  candidate: Address,
+  chainId: number,
+) => {
+  const contractAddress = getContractAddress('masternodeManager', chainId);
+
+  if (!contractAddress) {
+    throw new Error('Masternode manager contract address not configured.');
+  }
+
+  const client = getProvider();
+  const abi = loadContractAbi('masternodeManager');
+
+  return client.readContract({
+    address: contractAddress,
+    abi,
+    functionName: 'getCandidateCap',
+    args: [candidate],
+  }) as Promise<bigint>;
+};
+
+export const isCandidate = async (candidate: Address, chainId: number) => {
+  const contractAddress = getContractAddress('masternodeManager', chainId);
+
+  if (!contractAddress) {
+    throw new Error('Masternode manager contract address not configured.');
+  }
+
+  const client = getProvider();
+  const abi = loadContractAbi('masternodeManager');
+
+  return client.readContract({
+    address: contractAddress,
+    abi,
+    functionName: 'isCandidate',
+    args: [candidate],
+  }) as Promise<boolean>;
+};

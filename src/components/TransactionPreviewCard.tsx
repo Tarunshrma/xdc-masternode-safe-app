@@ -7,6 +7,10 @@ type TransactionPreviewCardProps = {
   validatorAddress: Address | null;
   stakeAmountWei: bigint | null;
   validationErrors: string[];
+  selectedAction: 'propose' | 'vote' | 'unvote' | 'resign' | 'withdraw';
+  unvoteCapWei: bigint | null;
+  withdrawBlockNumber: bigint | null;
+  withdrawIndexNumber: bigint | null;
 };
 
 type TransactionPreview = {
@@ -22,6 +26,10 @@ const TransactionPreviewCard = ({
   validatorAddress,
   stakeAmountWei,
   validationErrors,
+  selectedAction,
+  unvoteCapWei,
+  withdrawBlockNumber,
+  withdrawIndexNumber,
 }: TransactionPreviewCardProps) => {
   const [preview, setPreview] = useState<TransactionPreview | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -33,24 +41,63 @@ const TransactionPreviewCard = ({
       return;
     }
 
-    if (!chainId || !validatorAddress) {
+    if (
+      !chainId ||
+      (selectedAction !== 'withdraw' && !validatorAddress) ||
+      (selectedAction === 'propose' && stakeAmountWei === null) ||
+      (selectedAction === 'vote' && stakeAmountWei === null) ||
+      (selectedAction === 'unvote' && unvoteCapWei === null) ||
+      (selectedAction === 'withdraw' &&
+        (withdrawBlockNumber === null || withdrawIndexNumber === null))
+    ) {
       setPreview(null);
       setPreviewError(null);
       return;
     }
 
     try {
-      const payload = buildTransaction({
-        chainId: Number(chainId),
-        contractKey: 'masternodeManager',
-        functionName: 'propose',
-        args: [validatorAddress],
-        value: stakeAmountWei ?? 0n,
-      });
+      const payload =
+        selectedAction === 'withdraw'
+          ? buildTransaction({
+              chainId: Number(chainId),
+              contractKey: 'masternodeManager',
+              functionName: 'withdraw',
+              args: [withdrawBlockNumber, withdrawIndexNumber],
+            })
+          : selectedAction === 'unvote'
+            ? buildTransaction({
+                chainId: Number(chainId),
+                contractKey: 'masternodeManager',
+                functionName: 'unvote',
+                args: [validatorAddress, unvoteCapWei],
+              })
+            : buildTransaction({
+                chainId: Number(chainId),
+                contractKey: 'masternodeManager',
+                functionName: selectedAction,
+                args: [validatorAddress],
+                value:
+                  selectedAction === 'propose' || selectedAction === 'vote'
+                    ? stakeAmountWei ?? 0n
+                    : 0n,
+              });
       setPreview({
         contract: 'Masternode Manager',
-        method: 'propose(address)',
-        params: [validatorAddress],
+        method:
+          selectedAction === 'withdraw'
+            ? 'withdraw(uint256,uint256)'
+            : selectedAction === 'unvote'
+              ? 'unvote(address,uint256)'
+              : `${selectedAction}(address)`,
+        params:
+          selectedAction === 'withdraw'
+            ? [
+                String(withdrawBlockNumber ?? ''),
+                String(withdrawIndexNumber ?? ''),
+              ]
+            : selectedAction === 'unvote'
+              ? [String(validatorAddress), String(unvoteCapWei ?? '')]
+              : [String(validatorAddress)],
         to: payload.to,
         value: payload.value.toString(),
       });
@@ -59,7 +106,16 @@ const TransactionPreviewCard = ({
       setPreview(null);
       setPreviewError('Unable to build transaction preview.');
     }
-  }, [chainId, stakeAmountWei, validationErrors, validatorAddress]);
+  }, [
+    chainId,
+    selectedAction,
+    stakeAmountWei,
+    unvoteCapWei,
+    validationErrors,
+    validatorAddress,
+    withdrawBlockNumber,
+    withdrawIndexNumber,
+  ]);
 
   return (
     <section className="card">

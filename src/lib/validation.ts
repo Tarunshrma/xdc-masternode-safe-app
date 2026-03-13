@@ -61,3 +61,37 @@ export const validateAmount = (value: string) => {
     };
   }
 };
+
+export const validateUint = (value: string) => {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return {
+      isValid: false,
+      value: null,
+      error: 'Value is required.',
+    };
+  }
+
+  if (!/^\d+$/.test(trimmed)) {
+    return {
+      isValid: false,
+      value: null,
+      error: 'Value must be a whole number.',
+    };
+  }
+
+  try {
+    return {
+      isValid: true,
+      value: BigInt(trimmed),
+      error: null,
+    };
+  } catch (err) {
+    return {
+      isValid: false,
+      value: null,
+      error: 'Value is not a valid integer.',
+    };
+  }
+};
